@@ -56,7 +56,7 @@ class Conway(App):
         self.boardLayout.add_widget(Button(text="Step!", on_press=self.oneStep))
         self.boardLayout.add_widget(Button(text="Run!", on_press=self.runGame))
 
-        return self.boardLayout;
+        return self.boardLayout
 
     def pressCell(self, instance):
         instance.switchState()
