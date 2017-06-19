@@ -43,15 +43,19 @@ class Conway(App):
         self.isGameRunning = False
         self.boardLayout = GridLayout(cols=BOARD_SIZE)
         
-        # Initializing the board with size BOARD_SIZE by BOARD_SIZE
-        self.actualBoard = [[0 for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
+        # Initializing the board with size BOARD_SIZE+2 by BOARD_SIZE+2.
+        # The +2 part puts a boundary around the board to make checking neighbors less exception-inducing
+        self.actualBoard = [[0 for _ in range(BOARD_SIZE + 2)] for _ in range(BOARD_SIZE + 2)]
 
     def build(self):
-        for x in range(BOARD_SIZE):
-            for y in range(BOARD_SIZE):
+        for x in range(BOARD_SIZE + 2):
+            for y in range(BOARD_SIZE + 2):
                 currentCell = Cell(position=(x,y), on_press=self.pressCell)
-                self.boardLayout.add_widget(currentCell)
                 self.actualBoard[x][y] = currentCell
+
+                # add the cell to the board only if it isn't the boundary
+                if (x != 0) and (x != BOARD_SIZE + 2) and (y != 0) and (y != BOARD_SIZE + 2):
+                    self.boardLayout.add_widget(currentCell)
 
         self.boardLayout.add_widget(Button(text="Step!", on_press=self.oneStep))
         self.boardLayout.add_widget(Button(text="Run!", on_press=self.runGame))
@@ -107,43 +111,13 @@ class Conway(App):
             instance.text = "Run!"
 
     def NumberOfLivingNeighbors(self, cellPosition):
+        neighborOffsets = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
         currentCount = 0
         currentX, currentY = cellPosition
 
-        # Going through the column to the left of the current cell
-        if currentX - 1 >= 0:
-            if currentY - 1 >= 0:
-                if self.actualBoard[currentX-1][currentY-1].background_color ==  LIVE_COLOR:
-                    currentCount = currentCount + 1
-
-            if self.actualBoard[currentX-1][currentY].background_color ==  LIVE_COLOR:
+        for offsetX, offsetY in neighborOffsets:
+            if self.actualBoard[currentX-offsetX][currentY-offsetY].background_color ==  LIVE_COLOR:
                 currentCount = currentCount + 1
-
-            if currentY + 1 < BOARD_SIZE:
-                if self.actualBoard[currentX-1][currentY+1].background_color ==  LIVE_COLOR:
-                    currentCount = currentCount + 1
-
-        # Going through the current cell's column
-        if currentY - 1 >= 0:
-            if self.actualBoard[currentX][currentY-1].background_color ==  LIVE_COLOR:
-                currentCount = currentCount + 1
-
-        if currentY + 1 < BOARD_SIZE:
-            if self.actualBoard[currentX][currentY+1].background_color ==  LIVE_COLOR:
-                currentCount = currentCount + 1
-
-        # Going through the column to the right of the current cell
-        if currentX + 1 < BOARD_SIZE:
-            if currentY - 1 >= 0:
-                if self.actualBoard[currentX+1][currentY-1].background_color ==  LIVE_COLOR:
-                    currentCount = currentCount + 1
-
-            if self.actualBoard[currentX+1][currentY].background_color ==  LIVE_COLOR:
-                currentCount = currentCount + 1
-
-            if currentY + 1 < BOARD_SIZE:
-                if self.actualBoard[currentX+1][currentY+1].background_color ==  LIVE_COLOR:
-                    currentCount = currentCount + 1
 
         return currentCount
 
