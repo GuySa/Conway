@@ -54,7 +54,7 @@ class Conway(App):
                 self.actualBoard[x][y] = currentCell
 
                 # add the cell to the board only if it isn't the boundary
-                if (x != 0) and (x != BOARD_SIZE + 2) and (y != 0) and (y != BOARD_SIZE + 2):
+                if (x != 0) and (x != BOARD_SIZE + 1) and (y != 0) and (y != BOARD_SIZE + 1):
                     self.boardLayout.add_widget(currentCell)
 
         self.boardLayout.add_widget(Button(text="Step!", on_press=self.oneStep))
@@ -72,6 +72,11 @@ class Conway(App):
         # Going through every cell and checking death/birth
         for currentRow in self.actualBoard:
             for currentCell in currentRow:
+                # Skip, if this is a boundary and not an actual cell
+                if currentCell.position[0] == 0 or currentCell.position[0] == BOARD_SIZE + 1 or \
+                    currentCell.position[1] == 0 or currentCell.position[1] == BOARD_SIZE + 1:
+                    continue
+
                 numOfLivingNeighbors = self.NumberOfLivingNeighbors(currentCell.position)
 
                 if currentCell.cellState is "alive":
@@ -116,7 +121,7 @@ class Conway(App):
         currentX, currentY = cellPosition
 
         for offsetX, offsetY in neighborOffsets:
-            if self.actualBoard[currentX-offsetX][currentY-offsetY].background_color ==  LIVE_COLOR:
+            if self.actualBoard[currentX+offsetX][currentY+offsetY].background_color ==  LIVE_COLOR:
                 currentCount = currentCount + 1
 
         return currentCount
